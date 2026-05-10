@@ -1,0 +1,9 @@
+{
+    "name": "OneShot Archipelago",
+    "id": "oneshot.archipelago",
+    "description": "Archipelago Multiworld Randomizer integration for OneShot: WME",
+    "author": "JustAUser",
+    "version": "0.1.0",
+    "url": "",
+    "assembly_name": "oneshot.archipelago"
+}

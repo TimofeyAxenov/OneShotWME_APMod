@@ -1,0 +1,59 @@
+using HarmonyLib;
+using OneShotMG.src.Entities;
+using System.Globalization;
+
+namespace OneShot.Archipelago.Patches
+{
+    [HarmonyPatch(typeof(EventRunner), "commandChangeItems")]
+    public static class CheckPatch
+    {
+        [HarmonyPrefix]
+        public static bool Prefix(EventCommand command)
+        {
+            Mod.Context.Logger.Log("Patch triggered");
+
+            // Parse item ID
+            if (!int.TryParse(command.parameters[0], NumberStyles.Any, CultureInfo.InvariantCulture, out int itemId))
+            {
+                Mod.Context.Logger.Log("Failed to parse itemId");
+                return true;
+            }
+
+            // Determine operation (add/remove)
+            int operateValue = GetOperateValue(command);
+
+            // Only handle item ADD
+            if (operateValue <= 0)
+                return true;
+
+            Mod.Context.Logger.Log($"Intercepted item: {itemId}");
+
+            if (itemId == 2)
+           {
+                    Mod.Context.Logger.Log("Allowing TV Remote for access");
+                    return true;
+            }
+
+            // ✅ CALL YOUR EXISTING SYSTEM
+            LocationTracker.OnItemAdded(itemId);
+
+            // 🚫 BLOCK VANILLA ITEM
+            return false;
+        }
+
+        private static int GetOperateValue(EventCommand command)
+        {
+            try
+            {
+                int operation = int.Parse(command.parameters[1]);
+                int operand = int.Parse(command.parameters[3]);
+
+                return operation == 1 ? -operand : operand;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+    }
+}

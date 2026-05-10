@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <AssemblyName>oneshot.archipelago</AssemblyName>
+    <RootNamespace>OneShot.Archipelago</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WML API -->
+    <Reference Include="WML.API">
+            <HintPath>/home/timofey/.var/app/com.valvesoftware.Steam/data/Steam/steamapps/common/OneShot World Machine Edition/WML.API.dll</HintPath>
+    </Reference>
+    <Reference Include="0Harmony">
+        <HintPath>/home/timofey/.var/app/com.valvesoftware.Steam/data/Steam/steamapps/common/OneShot World Machine Edition/0Harmony.dll</HintPath>
+    </Reference>
+    <!-- Game assemblies -->
+    <Reference Include="OneShotMG">
+      <HintPath>/home/timofey/.var/app/com.valvesoftware.Steam/data/Steam/steamapps/common/OneShot World Machine Edition/OneShotMG.exe</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework">
+      <HintPath>/home/timofey/.var/app/com.valvesoftware.Steam/data/Steam/steamapps/common/OneShot World Machine Edition/MonoGame.Framework.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Archipelago client library -->
+    <PackageReference Include="Archipelago.MultiClient.Net" Version="6.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+          <PackageReference Include="Newtonsoft.Json" Version="13.*" />
+  </ItemGroup>
+</Project>

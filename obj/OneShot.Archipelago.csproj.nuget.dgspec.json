@@ -1,0 +1,67 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/timofey/Tools/OneShot.Archipelago/OneShot.Archipelago.csproj": {}
+  },
+  "projects": {
+    "/home/timofey/Tools/OneShot.Archipelago/OneShot.Archipelago.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/timofey/Tools/OneShot.Archipelago/OneShot.Archipelago.csproj",
+        "projectName": "oneshot.archipelago",
+        "projectPath": "/home/timofey/Tools/OneShot.Archipelago/OneShot.Archipelago.csproj",
+        "packagesPath": "/home/timofey/.nuget/packages/",
+        "outputPath": "/home/timofey/Tools/OneShot.Archipelago/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/timofey/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net462"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net462": {
+            "targetAlias": "net462",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.100"
+      },
+      "frameworks": {
+        "net462": {
+          "targetAlias": "net462",
+          "dependencies": {
+            "Archipelago.MultiClient.Net": {
+              "target": "Package",
+              "version": "[6.*, )"
+            },
+            "Microsoft.NETFramework.ReferenceAssemblies": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.0.3, )",
+              "autoReferenced": true
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.*, )"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.104/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
