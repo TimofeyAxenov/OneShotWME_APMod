@@ -7,12 +7,50 @@ using OneShotMG;
 using OneShotMG.src.Entities;
 using OneShotMG.src.TWM;
 using OneShotMG.src.TWM.Filesystem;
+using WorldMachineLoader.API;
 using WorldMachineLoader.API.Core;
 
 namespace OneShot.Archipelago.Patches
 {
     public class ScriptPatches
     {
+        [GamePatch(typeof(ScriptParser), "HandleScript", PatchType.Prefix,
+            typeof(OneshotWindow), typeof(string), typeof(EventRunner), typeof(int))]
+        public static bool HandleScript_Prefix(string script)
+        {
+            if (!APSaveManager.IsAPModeActive)
+                return true;
+
+            if (script.StartsWith("Script.put_key_in_box") ||
+                script == "Script.create_boxes" ||
+                script == "Script.clear_boxes")
+            {
+                Mod.Context.Logger.Log($"Archipelago: Blocked classical portal script: {script}");
+                return false;
+            }
+
+            if (script == "quit_game_bed" || script == "quit_game_no_save")
+            {
+                var osWindow = GameStateManager.GetWindow();
+                if (osWindow?.tileMapMan != null)
+                {
+                    var mapIdField = osWindow.tileMapMan.GetType().GetField("currentMapId",
+                        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                    if (mapIdField != null)
+                    {
+                        int mapId = (int)mapIdField.GetValue(osWindow.tileMapMan);
+                        if (mapId == 63)
+                        {
+                            Mod.Context.Logger.Log("Archipelago: Map 63 quit detected — sending leave ending goal");
+                            LocationTracker.OnLeaveEnding();
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
         [GamePatch(typeof(ScriptParser), "HandleScript", PatchType.Postfix,
             typeof(OneshotWindow), typeof(string), typeof(EventRunner), typeof(int))]
         public static void HandleScript_Postfix(string script)
@@ -20,10 +58,21 @@ namespace OneShot.Archipelago.Patches
             LocationTracker.OnScript(script);
         }
 
-        [GamePatch(typeof(UnlockManager), "UnlockAchievement", PatchType.Postfix, typeof(string))]
-        public static void UnlockAchievement_Postfix(string id)
+        [GamePatch(typeof(TWMFilesystem), "WriteFile", PatchType.Prefix,
+            typeof(string), typeof(TWMFile))]
+        public static bool WriteFile_Prefix(string path, TWMFile file)
         {
-            LocationTracker.OnAchievementUnlocked(id);
+            if (!APSaveManager.IsAPModeActive) return true;
+
+            if (file.name == "fakesave_filename") return true;
+
+            if (LocationTracker.OnFileWritten(file.name))
+            {
+                Mod.Context.Logger.Log($"Archipelago: Intercepted file write '{file.name}' — sending check");
+                return false;
+            }
+
+            return true;
         }
 
         [GamePatch(typeof(TWMFilesystem), "WriteFile", PatchType.Postfix,
@@ -52,6 +101,13 @@ namespace OneShot.Archipelago.Patches
         private static string SaveFolder => Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "OneShotWME");
+
+        public static void TeleportTo(int mapId, int tileX, int tileY)
+        {
+            var osWindow = Game1.windowMan?.GetOneshotWindow();
+            if (osWindow == null) return;
+            osWindow.tileMapMan.ChangeMap(mapId, tileX, tileY, 0.5f, (OneShotMG.src.Entity.Direction)2);
+        }
 
         public static void ReloadDesktop()
         {

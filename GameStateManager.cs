@@ -60,12 +60,6 @@ namespace OneShot.Archipelago
                                 osWindow.menuMan.ItemMan.AddItem(itemId);
                         }
                 }
-                else if ((itemId >= 401 && itemId <= 416) ||
-                         (itemId >= 426 && itemId <= 451) ||
-                         (itemId >= 461 && itemId <= 469))
-                {
-                    osWindow.flagMan.SetFlag(itemId);
-                }
                 else if (itemId >= 1000 && itemId < 1100) // FILE items
                 {
                         HandleFileItem(itemId, osWindow);
@@ -81,6 +75,10 @@ namespace OneShot.Archipelago
                 else if (itemId >= 1300 && itemId < 1400) // friends/messages
                 {
                         HandleFriendItem(itemId, osWindow);
+                }
+                else if (itemId >= 1400 && itemId < 1500) // badges
+                {
+                        HandleBadgeItem(itemId, osWindow);
                 }
                 ArchipelagoClient.ReceivingAPItem = false;
                 }
@@ -130,48 +128,123 @@ private static void HandleFileItem(int itemId, OneshotWindow osWindow)
     APClientWindow.AddMessage($"[File] Created AP file {id}");
 }
 
+private static readonly Dictionary<int, string> WallpaperItemMap = new Dictionary<int, string>
+{
+    { 1100, "lamp" },
+    { 1101, "factory" },
+    { 1102, "navigate" },
+    { 1103, "courtyard" },
+    { 1104, "ruins" },
+    { 1105, "catwalks" },
+    { 1106, "library" },
+    { 1107, "secret" },
+    { 1108, "lamplighter" },
+    { 1109, "cafe" },
+    { 1110, "plant" },
+    { 1111, "tower" },
+};
+
+private static readonly Dictionary<int, string> ThemeItemMap = new Dictionary<int, string>
+{
+    { 1200, "blue" },
+    { 1201, "teal" },
+    { 1202, "green" },
+    { 1203, "yellow" },
+    { 1204, "red" },
+    { 1205, "pink" },
+    { 1206, "orange" },
+    { 1207, "white" },
+    { 1208, "rainbow" },
+};
+
+private static readonly Dictionary<int, string> ProfileItemMap = new Dictionary<int, string>
+{
+    { 1300, "prophetbot" },
+    { 1301, "silver" },
+    { 1302, "rowbot" },
+    { 1303, "shepherd" },
+    { 1304, "magpie" },
+    { 1305, "calamus" },
+    { 1306, "alula" },
+    { 1307, "maize" },
+    { 1308, "ling" },
+    { 1309, "watcher" },
+    { 1310, "mason" },
+    { 1311, "lamplighter" },
+    { 1312, "kelvin" },
+    { 1313, "kip" },
+    { 1314, "george1" },
+};
+
+private static string MapItemId(int itemId, Dictionary<int, string> map, string label)
+{
+    if (map.TryGetValue(itemId, out string? gameId))
+        return gameId;
+    APClientWindow.AddMessage($"[{label}] Warning: no game string mapping for item {itemId}");
+    return itemId.ToString();
+}
+
 private static void HandleWallpaperItem(int itemId, OneshotWindow osWindow)
 {
-    string id = itemId.ToString();
+    string gameId = MapItemId(itemId, WallpaperItemMap, "Wallpaper");
 
-    Game1.windowMan.UnlockMan.UnlockWallpaper(id);
-    Game1.windowMan.FileSystem.CreateWallpaperFile(id);
+    Game1.windowMan.UnlockMan.UnlockWallpaper(gameId);
+    Game1.windowMan.FileSystem.CreateWallpaperFile(gameId);
 
     Game1.windowMan.SaveDesktopAndFileSystem();
 
-    APClientWindow.AddMessage($"[Wallpaper] Unlocked wallpaper {id}");
+    APClientWindow.AddMessage($"[Wallpaper] Unlocked wallpaper '{gameId}'");
 }
 
 private static void HandleThemeItem(int itemId, OneshotWindow osWindow)
 {
+    string gameId = MapItemId(itemId, ThemeItemMap, "Theme");
 
-        string id = itemId.ToString();
-    Game1.windowMan.UnlockMan.UnlockTheme(id);
+    Game1.windowMan.UnlockMan.UnlockTheme(gameId);
 
-    Game1.windowMan.FileSystem.CreateThemeFile(id);
+    Game1.windowMan.FileSystem.CreateThemeFile(gameId);
 
     Game1.windowMan.SaveDesktopAndFileSystem();
 
-    APClientWindow.AddMessage($"[Theme] Unlocked theme {id}");
+    APClientWindow.AddMessage($"[Theme] Unlocked theme '{gameId}'");
 }
 
 private static void HandleFriendItem(int itemId, OneshotWindow osWindow)
 {
+    string gameId = MapItemId(itemId, ProfileItemMap, "Profile");
 
-        string id = itemId.ToString();
-    var fs = Game1.windowMan.FileSystem;
-
-    var file = new TWMFile(
-        $"ap_contact_{id}",
-        $"Contact {id}",
-        LaunchableWindowType.CONTACTS
-    );
-
-    fs.WriteFile("/", file);
+    Game1.windowMan.UnlockMan.UnlockProfile(gameId);
 
     Game1.windowMan.SaveDesktopAndFileSystem();
 
-    APClientWindow.AddMessage($"[Friend] New contact unlocked {id}");
+    APClientWindow.AddMessage($"[Profile] Unlocked profile '{gameId}'");
+}
+
+private static readonly Dictionary<int, string> BadgeItemMap = new Dictionary<int, string>
+{
+    { 1400, "CHAOTIC_EVIL" },
+    { 1401, "SHOCK" },
+    { 1402, "EXTREME_BARTERING" },
+    { 1403, "RAM_WHISPERER" },
+    { 1404, "WE_RIDE_AT_DAWN" },
+    { 1405, "SECRET" },
+    { 1406, "BOOKWORM" },
+    { 1407, "PANCAKES" },
+    { 1408, "REBIRTH" },
+    { 1409, "ONESHOT" },
+};
+
+private static void HandleBadgeItem(int itemId, OneshotWindow osWindow)
+{
+    string badgeId = itemId.ToString();
+    if (BadgeItemMap.TryGetValue(itemId, out string? mappedId))
+        badgeId = mappedId;
+
+    Game1.windowMan.UnlockMan.UnlockAchievement(badgeId);
+
+    Game1.windowMan.SaveDesktopAndFileSystem();
+
+    APClientWindow.AddMessage($"[Badge] Unlocked badge '{badgeId}'");
 }
 
         private static void ExecuteTrap(string trapType, OneshotWindow osWindow)

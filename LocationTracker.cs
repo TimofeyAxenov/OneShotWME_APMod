@@ -18,6 +18,14 @@ namespace OneShot.Archipelago
 
         public static Dictionary<string, long>? TWMFileToLocation = null;
 
+        public static Dictionary<string, long>? WallpaperToLocation = null;
+
+        public static Dictionary<string, long>? ThemeToLocation = null;
+
+        public static Dictionary<string, long>? ProfileToLocation = null;
+
+        public static Dictionary<string, long>? BadgeToLocation = null;
+
         public const int FLAG_NORMAL_ENDING   = 147;
         public const int FLAG_LEAVE_ENDING    = 153;
         public const int FLAG_SOLSTICE_ENDING = 160;
@@ -63,11 +71,30 @@ namespace OneShot.Archipelago
                     goal = i;
             }
 
-            if (goal == 0 && flagIndex == FLAG_LEAVE_ENDING)
+            if (goal == 1 && flagIndex == FLAG_NORMAL_ENDING)
                 ArchipelagoClient.SendGoalCompletion();
-            else if (goal == 1 && flagIndex == FLAG_NORMAL_ENDING)
-                ArchipelagoClient.SendGoalCompletion();
-            else if (goal == 2 && flagIndex == FLAG_SOLSTICE_ENDING)
+        }
+
+        public static void OnLeaveEnding()
+        {
+            if (!ArchipelagoClient.Connected) return;
+
+            var slotData = ArchipelagoClient.SlotData;
+            if (slotData == null) return;
+
+            object goalVal;
+            int goal = 1;
+            if (slotData.TryGetValue("Goal", out goalVal))
+            {
+                if (goalVal is Newtonsoft.Json.Linq.JValue jv)
+                    goal = jv.ToObject<int>();
+                else if (goalVal is long l)
+                    goal = (int)l;
+                else if (goalVal is int i)
+                    goal = i;
+            }
+
+            if (goal == 0)
                 ArchipelagoClient.SendGoalCompletion();
         }
 
@@ -108,7 +135,93 @@ namespace OneShot.Archipelago
             if (!ArchipelagoClient.Connected) return;
            if (TWMFileToLocation != null && TWMFileToLocation.TryGetValue(fileName, out long locId))
                  SendCheck(locId);
-         }
+          }
+
+        public static bool OnWallpaperUnlocked(string id)
+        {
+            EnsureInitialized();
+            if (!APSaveManager.IsAPModeActive) return false;
+            if (ArchipelagoClient.ReceivingAPItem) return false;
+            if (WallpaperToLocation == null) return false;
+            if (WallpaperToLocation.TryGetValue(id, out long locId))
+            {
+                if (ArchipelagoClient.IsLocationInSeed(locId))
+                {
+                    SendCheck(locId);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static bool OnThemeUnlocked(string id)
+        {
+            EnsureInitialized();
+            if (!APSaveManager.IsAPModeActive) return false;
+            if (ArchipelagoClient.ReceivingAPItem) return false;
+            if (ThemeToLocation == null) return false;
+            if (ThemeToLocation.TryGetValue(id, out long locId))
+            {
+                if (ArchipelagoClient.IsLocationInSeed(locId))
+                {
+                    SendCheck(locId);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static bool OnProfileUnlocked(string id)
+        {
+            EnsureInitialized();
+            if (!APSaveManager.IsAPModeActive) return false;
+            if (ArchipelagoClient.ReceivingAPItem) return false;
+            if (ProfileToLocation == null) return false;
+            if (ProfileToLocation.TryGetValue(id, out long locId))
+            {
+                if (ArchipelagoClient.IsLocationInSeed(locId))
+                {
+                    SendCheck(locId);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static bool OnBadgeUnlocked(string id)
+        {
+            EnsureInitialized();
+            if (!APSaveManager.IsAPModeActive) return false;
+            if (ArchipelagoClient.ReceivingAPItem) return false;
+            if (BadgeToLocation == null) return false;
+            if (BadgeToLocation.TryGetValue(id, out long locId))
+            {
+                if (ArchipelagoClient.IsLocationInSeed(locId))
+                {
+                    SendCheck(locId);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static bool OnFileWritten(string fileName)
+        {
+            EnsureInitialized();
+            if (!APSaveManager.IsAPModeActive) return false;
+            if (ArchipelagoClient.ReceivingAPItem) return false;
+            if (TWMFileToLocation == null) return false;
+            if (TWMFileToLocation.TryGetValue(fileName, out long locId))
+            {
+                if (ArchipelagoClient.IsLocationInSeed(locId))
+                {
+                    SendCheck(locId);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public static long GetItemLocationId(int itemId)
 {
     if (ItemPickupToLocation.TryGetValue(itemId, out var id))
@@ -125,22 +238,19 @@ private static void EnsureInitialized()
     _initialized = true;
     InterceptedItems = new List<int> {};
     FlagToLocation = new Dictionary<int, long> {
-            // Wallpapers
+            // Wallpaper flags (read-only proxies, never set by game events, but kept for safety)
             { 401, LOC_ID_BASE + 300 }, { 402, LOC_ID_BASE + 301 }, { 403, LOC_ID_BASE + 302 },
             { 404, LOC_ID_BASE + 303 }, { 405, LOC_ID_BASE + 304 }, { 406, LOC_ID_BASE + 305 },
             { 407, LOC_ID_BASE + 306 }, { 408, LOC_ID_BASE + 307 }, { 409, LOC_ID_BASE + 308 },
             { 410, LOC_ID_BASE + 309 }, { 411, LOC_ID_BASE + 310 }, { 412, LOC_ID_BASE + 311 },
-            { 413, LOC_ID_BASE + 312 }, { 414, LOC_ID_BASE + 313 }, { 415, LOC_ID_BASE + 314 },
-            { 416, LOC_ID_BASE + 315 },
-            // Profiles
+            // Profile flags (read-only proxies, never set by game events)
+            // flag -> AP location: see FlagManager constants and AP Locations.py
             { 426, LOC_ID_BASE + 400 }, { 427, LOC_ID_BASE + 401 }, { 428, LOC_ID_BASE + 402 },
-            { 429, LOC_ID_BASE + 403 }, { 430, LOC_ID_BASE + 404 }, { 431, LOC_ID_BASE + 405 },
-            { 432, LOC_ID_BASE + 406 }, { 433, LOC_ID_BASE + 407 }, { 434, LOC_ID_BASE + 408 },
-            { 435, LOC_ID_BASE + 409 }, { 436, LOC_ID_BASE + 410 }, { 437, LOC_ID_BASE + 411 },
-            { 438, LOC_ID_BASE + 412 }, { 439, LOC_ID_BASE + 413 }, { 440, LOC_ID_BASE + 414 },
-            { 446, LOC_ID_BASE + 420 }, { 447, LOC_ID_BASE + 421 }, { 448, LOC_ID_BASE + 422 },
-            { 449, LOC_ID_BASE + 423 }, { 450, LOC_ID_BASE + 424 }, { 451, LOC_ID_BASE + 425 },
-            // Themes
+            { 429, LOC_ID_BASE + 410 }, { 430, LOC_ID_BASE + 403 }, { 431, LOC_ID_BASE + 405 },
+            { 432, LOC_ID_BASE + 404 }, { 433, LOC_ID_BASE + 406 }, { 435, LOC_ID_BASE + 408 },
+            { 436, LOC_ID_BASE + 407 }, { 438, LOC_ID_BASE + 409 }, { 439, LOC_ID_BASE + 411 },
+            { 440, LOC_ID_BASE + 412 },
+            // Themes (read-only proxies)
             { 461, LOC_ID_BASE + 500 }, { 462, LOC_ID_BASE + 501 }, { 463, LOC_ID_BASE + 502 },
             { 464, LOC_ID_BASE + 503 }, { 465, LOC_ID_BASE + 504 }, { 466, LOC_ID_BASE + 505 },
             { 467, LOC_ID_BASE + 506 }, { 468, LOC_ID_BASE + 507 }, { 469, LOC_ID_BASE + 508 },
@@ -150,13 +260,12 @@ private static void EnsureInitialized()
             { "SHOCK",             LOC_ID_BASE + 601 },
             { "EXTREME_BARTERING", LOC_ID_BASE + 602 },
             { "RAM_WHISPERER",     LOC_ID_BASE + 603 },
-            { "PANCAKES",          LOC_ID_BASE + 604 },
-            { "WE_RIDE_AT_DAWN",   LOC_ID_BASE + 605 },
-            { "SECRET",            LOC_ID_BASE + 606 },
-            { "BOOKWORM",          LOC_ID_BASE + 607 },
+            { "WE_RIDE_AT_DAWN",   LOC_ID_BASE + 604 },
+            { "SECRET",            LOC_ID_BASE + 605 },
+            { "BOOKWORM",          LOC_ID_BASE + 606 },
+            { "PANCAKES",          LOC_ID_BASE + 607 },
             { "REBIRTH",           LOC_ID_BASE + 608 },
             { "ONESHOT",           LOC_ID_BASE + 609 },
-            { "RETURN",            LOC_ID_BASE + 610 },
         };
     ScriptToLocation = new Dictionary<string, long> {
             { "safe_puzzle_write", LOC_ID_BASE + 200 },
@@ -165,11 +274,60 @@ private static void EnsureInitialized()
             { "Script.put_key_in_box(2)", LOC_ID_BASE + 203 },
             { "Script.put_key_in_box(3)", LOC_ID_BASE + 204 },
         };
-//    TWMFileToLocation = new Dictionary<string, long> {
-//            { "prototype_npcsheet_filename", LOC_ID_BASE + 202 },
-//            { "cedric_npcsheet_filename",    LOC_ID_BASE + 203 },
-//           { "rue_npcsheet_filename",       LOC_ID_BASE + 204 },
-//        };
+    WallpaperToLocation = new Dictionary<string, long> {
+            { "lamp",        LOC_ID_BASE + 300 },
+            { "factory",     LOC_ID_BASE + 301 },
+            { "navigate",    LOC_ID_BASE + 302 },
+            { "courtyard",   LOC_ID_BASE + 303 },
+            { "ruins",       LOC_ID_BASE + 304 },
+            { "catwalks",    LOC_ID_BASE + 305 },
+            { "library",     LOC_ID_BASE + 306 },
+            { "secret",      LOC_ID_BASE + 307 },
+            { "lamplighter", LOC_ID_BASE + 308 },
+            { "cafe",        LOC_ID_BASE + 309 },
+            { "plant",       LOC_ID_BASE + 310 },
+            { "tower",       LOC_ID_BASE + 311 },
+        };
+    ThemeToLocation = new Dictionary<string, long> {
+            { "blue",    LOC_ID_BASE + 500 },
+            { "teal",    LOC_ID_BASE + 501 },
+            { "yellow",  LOC_ID_BASE + 502 },
+            { "green",   LOC_ID_BASE + 503 },
+            { "red",     LOC_ID_BASE + 504 },
+            { "pink",    LOC_ID_BASE + 505 },
+            { "orange",  LOC_ID_BASE + 506 },
+            { "white",   LOC_ID_BASE + 507 },
+            { "rainbow", LOC_ID_BASE + 508 },
+        };
+    ProfileToLocation = new Dictionary<string, long> {
+            { "prophetbot",  LOC_ID_BASE + 400 },
+            { "silver",      LOC_ID_BASE + 401 },
+            { "rowbot",      LOC_ID_BASE + 402 },
+            { "magpie",      LOC_ID_BASE + 403 },
+            { "alula",       LOC_ID_BASE + 404 },
+            { "calamus",     LOC_ID_BASE + 405 },
+            { "maize",       LOC_ID_BASE + 406 },
+            { "mason",       LOC_ID_BASE + 407 },
+            { "watcher",     LOC_ID_BASE + 408 },
+            { "kelvin",      LOC_ID_BASE + 409 },
+            { "shepherd",    LOC_ID_BASE + 410 },
+            { "kip",         LOC_ID_BASE + 411 },
+            { "george1",     LOC_ID_BASE + 412 },
+        };
+    BadgeToLocation = new Dictionary<string, long> {
+            { "CHAOTIC_EVIL",      LOC_ID_BASE + 600 },
+            { "SHOCK",             LOC_ID_BASE + 601 },
+            { "EXTREME_BARTERING", LOC_ID_BASE + 602 },
+            { "RAM_WHISPERER",     LOC_ID_BASE + 603 },
+            { "WE_RIDE_AT_DAWN",   LOC_ID_BASE + 604 },
+            { "SECRET",            LOC_ID_BASE + 605 },
+            { "BOOKWORM",          LOC_ID_BASE + 606 },
+            { "PANCAKES",          LOC_ID_BASE + 607 },
+            { "REBIRTH",           LOC_ID_BASE + 608 },
+            { "ONESHOT",           LOC_ID_BASE + 609 },
+        };
+    TWMFileToLocation = new Dictionary<string, long> {
+        };
     ItemPickupToLocation = new Dictionary<int, long> {
             // Starter House
             { 4,  LOC_ID_BASE + 1  },  // Left Room (branch)

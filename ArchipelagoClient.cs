@@ -35,9 +35,14 @@ namespace OneShot.Archipelago
 }
 
 
-public static void MarkLocationChecked(long locationId)
+        public static void MarkLocationChecked(long locationId)
 {
     CheckedLocations.Add(locationId);
+}
+
+public static bool IsLocationInSeed(long locationId)
+{
+    return Session?.Locations.AllLocations.Contains(locationId) ?? false;
 }
 
         public static bool Connect(string host, int port, string slotName, string? password = null)
@@ -149,6 +154,51 @@ public static void MarkLocationChecked(long locationId)
             {
                 GameStateManager.PendingItems.Enqueue((int)gameItemId);
                 GameStateManager.PendingChat.Enqueue($"[Collectible] {item.ItemName}");
+                _appliedItemCount++;
+                return;
+            }
+
+            // Wallpapers received as AP items (1100-1199)
+            if (gameItemId >= 1100 && gameItemId < 1200)
+            {
+                GameStateManager.PendingItems.Enqueue((int)gameItemId);
+                GameStateManager.PendingChat.Enqueue($"[Wallpaper] {item.ItemName}");
+                _appliedItemCount++;
+                return;
+            }
+
+            // Themes received as AP items (1200-1299)
+            if (gameItemId >= 1200 && gameItemId < 1300)
+            {
+                GameStateManager.PendingItems.Enqueue((int)gameItemId);
+                GameStateManager.PendingChat.Enqueue($"[Theme] {item.ItemName}");
+                _appliedItemCount++;
+                return;
+            }
+
+            // Profiles received as AP items (1300-1399)
+            if (gameItemId >= 1300 && gameItemId < 1400)
+            {
+                GameStateManager.PendingItems.Enqueue((int)gameItemId);
+                GameStateManager.PendingChat.Enqueue($"[Profile] {item.ItemName}");
+                _appliedItemCount++;
+                return;
+            }
+
+            // Badges received from AP (1400-1499)
+            if (gameItemId >= 1400 && gameItemId < 1500)
+            {
+                GameStateManager.PendingItems.Enqueue((int)gameItemId);
+                GameStateManager.PendingChat.Enqueue($"[Badge] {item.ItemName}");
+                _appliedItemCount++;
+                return;
+            }
+
+            // Files received from AP (1000-1099)
+            if (gameItemId >= 1000 && gameItemId < 1100)
+            {
+                GameStateManager.PendingItems.Enqueue((int)gameItemId);
+                GameStateManager.PendingChat.Enqueue($"[File] {item.ItemName}");
                 _appliedItemCount++;
                 return;
             }

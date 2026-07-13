@@ -1,8 +1,3 @@
-/home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot.Archipelago.csproj.AssemblyReference.cache
-/home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot.Archipelago.GeneratedMSBuildEditorConfig.editorconfig
-/home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot.Archipelago.AssemblyInfoInputs.cache
-/home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot.Archipelago.AssemblyInfo.cs
-/home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot.Archipelago.csproj.CoreCompileInputs.cache
 /home/timofey/Tools/OneShot.Archipelago/bin/Debug/net462/oneshot.archipelago.dll
 /home/timofey/Tools/OneShot.Archipelago/bin/Debug/net462/oneshot.archipelago.pdb
 /home/timofey/Tools/OneShot.Archipelago/bin/Debug/net462/Archipelago.MultiClient.Net.dll
@@ -21,7 +16,12 @@
 /home/timofey/Tools/OneShot.Archipelago/bin/Debug/net462/MonoGame.Framework.dll.config
 /home/timofey/Tools/OneShot.Archipelago/bin/Debug/net462/INIFileParser.xml
 /home/timofey/Tools/OneShot.Archipelago/bin/Debug/net462/System.ValueTuple.xml
+/home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot.Archipelago.csproj.AssemblyReference.cache
+/home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot.Archipelago.GeneratedMSBuildEditorConfig.editorconfig
+/home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot.Archipelago.AssemblyInfoInputs.cache
+/home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot.Archipelago.AssemblyInfo.cs
+/home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot.Archipelago.csproj.CoreCompileInputs.cache
+/home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot.Archipelago.sourcelink.json
 /home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot..EB082567.Up2Date
 /home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/oneshot.archipelago.dll
 /home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/oneshot.archipelago.pdb
-/home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot.Archipelago.sourcelink.json

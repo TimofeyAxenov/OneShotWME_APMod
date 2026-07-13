@@ -35,15 +35,21 @@ namespace OneShot.Archipelago.Patches
                 }
 
             if (itemId == 2)
-           {
+            {
                     Mod.Context.Logger.Log("Allowing TV Remote for access");
                     return true;
             }
 
-            // ✅ CALL YOUR EXISTING SYSTEM
+            // If player already has this item (received from AP), let it through silently — no check needed
+            var osWindow = GameStateManager.GetWindow();
+            if (osWindow != null && osWindow.menuMan.ItemMan.HasItem(itemId))
+            {
+                    Mod.Context.Logger.Log($"Archipelago: Player already has item {itemId}, letting pickup through");
+                    return true;
+            }
+
             LocationTracker.OnItemAdded(itemId);
 
-            // 🚫 BLOCK VANILLA ITEM
             return false;
         }
 
