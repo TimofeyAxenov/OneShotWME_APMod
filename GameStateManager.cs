@@ -19,12 +19,25 @@ namespace OneShot.Archipelago
 
         public static OneshotWindow? GetWindow() => Game1.windowMan?.GetOneshotWindow();
 
-        public static bool SuppressItemIntercept = false;
-
         public static Random random = new Random();
 
         public static void Tick()
         {
+                try {
+//                        Mod.Context.Logger.Log("[AP DEBUG] Tick entered");
+
+        if (ArchipelagoClient.Session == null)
+        {
+//            Mod.Context.Logger.Log("[AP DEBUG] AP client null");
+            return;
+        }
+
+        if (Game1.windowMan == null)
+        {
+//            Mod.Context.Logger.Log("[AP DEBUG] windowMan null");
+            return;
+        }
+
             var osWindow = GetWindow();
             if (osWindow == null) return;
 
@@ -34,9 +47,9 @@ namespace OneShot.Archipelago
                 var ItemInterceptedBefore = LocationTracker.InterceptedItems.Contains(itemId);
                 if (!ItemInterceptedBefore) {
                 Mod.Context.Logger.Log($"Archipelago: Applying item ID {itemId}");
+                ArchipelagoClient.ReceivingAPItem = true;
                 if (itemId >= 1 && itemId <= 78 && itemId != 2)
                 {
-                        SuppressItemIntercept = true;
                         if (itemId == 45) {
                                 int PhotoIdIndex = random.Next(PhotoIds.Count);
                                 var PhotoId = PhotoIds[PhotoIdIndex];
@@ -46,10 +59,6 @@ namespace OneShot.Archipelago
                         else {
                                 osWindow.menuMan.ItemMan.AddItem(itemId);
                         }
-                        SuppressItemIntercept = false;
-//                        SuppressItemIntercept = true;
-//                       osWindow.menuMan.ItemMan.AddItem(itemId);
-//                    SuppressItemIntercept = false;
                 }
                 else if ((itemId >= 401 && itemId <= 416) ||
                          (itemId >= 426 && itemId <= 451) ||
@@ -57,7 +66,7 @@ namespace OneShot.Archipelago
                 {
                     osWindow.flagMan.SetFlag(itemId);
                 }
-                else if (itemId >= 1000 && itemId < 1100) // example: FILE items
+                else if (itemId >= 1000 && itemId < 1100) // FILE items
                 {
                         HandleFileItem(itemId, osWindow);
                 }
@@ -73,6 +82,7 @@ namespace OneShot.Archipelago
                 {
                         HandleFriendItem(itemId, osWindow);
                 }
+                ArchipelagoClient.ReceivingAPItem = false;
                 }
             }
 
@@ -94,7 +104,11 @@ namespace OneShot.Archipelago
             {
                 PendingLocationRefresh = false;
                 APLocationWindow.Refresh();
-            }
+            }}
+        catch (Exception ex)
+    {
+        Mod.Context.Logger.Log($"[AP ERROR] Tick crash: {ex}");
+    }
         }
 
 private static void HandleFileItem(int itemId, OneshotWindow osWindow)
@@ -113,7 +127,7 @@ private static void HandleFileItem(int itemId, OneshotWindow osWindow)
 
     Game1.windowMan.SaveDesktopAndFileSystem();
 
-    APWindow.AddMessage($"[File] Created AP file {id}");
+    APClientWindow.AddMessage($"[File] Created AP file {id}");
 }
 
 private static void HandleWallpaperItem(int itemId, OneshotWindow osWindow)
@@ -125,7 +139,7 @@ private static void HandleWallpaperItem(int itemId, OneshotWindow osWindow)
 
     Game1.windowMan.SaveDesktopAndFileSystem();
 
-    APWindow.AddMessage($"[Wallpaper] Unlocked wallpaper {id}");
+    APClientWindow.AddMessage($"[Wallpaper] Unlocked wallpaper {id}");
 }
 
 private static void HandleThemeItem(int itemId, OneshotWindow osWindow)
@@ -138,7 +152,7 @@ private static void HandleThemeItem(int itemId, OneshotWindow osWindow)
 
     Game1.windowMan.SaveDesktopAndFileSystem();
 
-    APWindow.AddMessage($"[Theme] Unlocked theme {id}");
+    APClientWindow.AddMessage($"[Theme] Unlocked theme {id}");
 }
 
 private static void HandleFriendItem(int itemId, OneshotWindow osWindow)
@@ -157,7 +171,7 @@ private static void HandleFriendItem(int itemId, OneshotWindow osWindow)
 
     Game1.windowMan.SaveDesktopAndFileSystem();
 
-    APWindow.AddMessage($"[Friend] New contact unlocked {id}");
+    APClientWindow.AddMessage($"[Friend] New contact unlocked {id}");
 }
 
         private static void ExecuteTrap(string trapType, OneshotWindow osWindow)

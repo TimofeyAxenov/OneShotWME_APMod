@@ -24,3 +24,4 @@
 /home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot..EB082567.Up2Date
 /home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/oneshot.archipelago.dll
 /home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/oneshot.archipelago.pdb
+/home/timofey/Tools/OneShot.Archipelago/obj/Debug/net462/OneShot.Archipelago.sourcelink.json

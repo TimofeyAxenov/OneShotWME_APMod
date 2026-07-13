@@ -1,9 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using Newtonsoft.Json;
 using OneShotMG;
 using OneShotMG.src.Entities;
 using OneShotMG.src.TWM;
 using OneShotMG.src.TWM.Filesystem;
 using WorldMachineLoader.API.Core;
-//using OneShot.Archipelago;
 
 namespace OneShot.Archipelago.Patches
 {
@@ -29,6 +33,9 @@ namespace OneShot.Archipelago.Patches
 
                 if (!IsGameReady())
                         return;
+        Mod.Context.Logger.Log($"Archipelago: Writing File to Filesystem: {file.name}");
+        if (file.name == "fakesave_filename")
+                return;
             LocationTracker.OnTWMFileWritten(file.name);
         }
 
@@ -42,14 +49,51 @@ namespace OneShot.Archipelago.Patches
 
     public static class WindowManagerHelper
     {
-        public static void ReloadFilesystemAndDesktop()
+        private static string SaveFolder => Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "OneShotWME");
+
+        public static void ReloadDesktop()
         {
-            if (Game1.windowMan == null) return;
-            var method = typeof(OneShotMG.src.TWM.WindowManager)
-                .GetMethod("LoadFilesystemAndDesktop",
-                    System.Reflection.BindingFlags.NonPublic |
-                    System.Reflection.BindingFlags.Instance);
-            method?.Invoke(Game1.windowMan, null);
+            var wm = Game1.windowMan;
+            if (wm == null) return;
+
+            string path = Path.Combine(SaveFolder, "desktop.dat");
+            if (!File.Exists(path)) return;
+
+            try
+            {
+                var dtData = JsonConvert.DeserializeObject<FilesystemSaveManager.DesktopSaveData>(
+                    File.ReadAllText(path));
+                if (dtData == null) return;
+
+                wm.Desktop.SetLayout(dtData);
+                wm.UnlockMan?.LoadSaveData(dtData);
+
+                if (dtData.currentTheme != null)
+                {
+                    var themeField = typeof(WindowManager).GetField("theme",
+                        BindingFlags.NonPublic | BindingFlags.Instance);
+                    var theme = wm.GetThemeById(dtData.currentTheme);
+                    if (themeField != null && theme != null)
+                        themeField.SetValue(wm, theme);
+                }
+
+                wm.FileSystem?.CreateWallpaperFiles(
+                    wm.UnlockMan?.UnlockedWallpapers ?? new List<string>());
+                wm.FileSystem?.CreateThemeFiles(
+                    wm.UnlockMan?.UnlockedThemes ?? new List<string>());
+
+                Game1.gMan.Gamma = dtData.Gamma;
+                Game1.soundMan.BGMVol = dtData.BGMVolume;
+                Game1.soundMan.SFXVol = dtData.SFXVolume;
+
+                Mod.Context.Logger.Log("Archipelago: Desktop reloaded from disk.");
+            }
+            catch (Exception ex)
+            {
+                Mod.Context.Logger.Log($"Archipelago: Desktop reload failed: {ex.Message}");
+            }
         }
     }
 }

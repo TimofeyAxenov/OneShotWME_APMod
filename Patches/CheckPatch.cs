@@ -28,6 +28,12 @@ namespace OneShot.Archipelago.Patches
 
             Mod.Context.Logger.Log($"Intercepted item: {itemId}");
 
+            if (ArchipelagoClient.ReceivingAPItem)
+                {
+                    Mod.Context.Logger.Log($"[AP] Ignoring AP-granted item {itemId}");
+                    return true;
+                }
+
             if (itemId == 2)
            {
                     Mod.Context.Logger.Log("Allowing TV Remote for access");

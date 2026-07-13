@@ -514,7 +514,7 @@
             "version": "[13.*, )"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.104/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.109/RuntimeIdentifierGraph.json"
       }
     }
   }

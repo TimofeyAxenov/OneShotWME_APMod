@@ -42,11 +42,19 @@ namespace OneShot.Archipelago
                 GameStateManager.Tick
             );
 
-            // Auto-save AP progress every 30s
+            // Periodic backup of AP save files (every 30s while AP mode is active).
+            // Does NOT trigger a game save — just copies whatever the game last wrote.
             Context.Scheduler.RunEvery(
                 System.TimeSpan.FromSeconds(30),
-                AutoSaveAP
+                PeriodicBackup
             );
+        }
+
+        private static void PeriodicBackup()
+        {
+            if (!APSaveManager.IsAPModeActive || APSaveManager.ActiveSaveKey == null)
+                return;
+            APSaveManager.BackupAPFiles(APSaveManager.ActiveSaveKey);
         }
 
         private static void OnGameInitialize(Game1InitializeEvent e)
@@ -57,9 +65,21 @@ namespace OneShot.Archipelago
 
         private static void OnWindowManagerInitialized(WindowManagerInitializedEvent e)
         {
-            // Always vanilla on boot — never auto-activate AP save
-            Context.Logger.Log("Archipelago: Starting in vanilla mode.");
             Game1.windowMan.AddWindow(new APSaveManagerWindow());
+            APSaveManager.TryResumeActiveSession();
+
+            if (APSaveManager.IsAPModeActive)
+            {
+                Context.Logger.Log("Archipelago: AP mode restored from saved session.");
+                APClientWindow.Initialize();
+                APLocationWindow.Initialize();
+                APHintsWindow.Initialize();
+                RegionWindow.Initialize();
+            }
+            else
+            {
+                Context.Logger.Log("Archipelago: Starting in vanilla mode.");
+            }
         }
 
         private static void OnItemAdded(ItemAddedEvent e)
@@ -71,13 +91,6 @@ namespace OneShot.Archipelago
         {
             if (e.AchievementID != null)
                 LocationTracker.OnAchievementUnlocked(e.AchievementID);
-        }
-
-        private static void AutoSaveAP()
-        {
-            if (!APSaveManager.IsAPModeActive || !ArchipelagoClient.Connected) return;
-            if (APSaveManager.ActiveSaveKey != null)
-                APSaveManager.BackupAPFiles(APSaveManager.ActiveSaveKey);
         }
 
         public void OnShutdown()

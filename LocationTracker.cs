@@ -22,7 +22,6 @@ namespace OneShot.Archipelago
         public const int FLAG_LEAVE_ENDING    = 153;
         public const int FLAG_SOLSTICE_ENDING = 160;
 
-
         private static readonly System.Collections.Generic.HashSet<long> SentLocations =
             new System.Collections.Generic.HashSet<long>();
 
@@ -35,12 +34,13 @@ namespace OneShot.Archipelago
             SentLocations.Add(locationId);
             Mod.Context.Logger.Log($"Archipelago: Sending location check {locationId}");
             ArchipelagoClient.SendLocationCheck(locationId);
-            APWindow.AddMessage($"[Check] Sent location {locationId}");
+            APClientWindow.AddMessage($"[Check] Sent location {locationId}");
         }
 
         public static void OnFlagSet(int flagIndex)
         {
             if (!ArchipelagoClient.Connected) return;
+            if (ArchipelagoClient.ReceivingAPItem) return;
 
             if (FlagToLocation.TryGetValue(flagIndex, out long locId))
             {
@@ -80,6 +80,7 @@ namespace OneShot.Archipelago
                 EnsureInitialized();
             if (!ArchipelagoClient.Connected) return;
             if (!APSaveManager.IsAPModeActive) return;
+            if (ArchipelagoClient.ReceivingAPItem) return;
             if (ItemPickupToLocation != null && ItemPickupToLocation.TryGetValue(gameItemId, out long locId))
                 SendCheck(locId);
         }
@@ -101,13 +102,13 @@ namespace OneShot.Archipelago
                 SendCheck(locId);
         }
 
-       public static void OnTWMFileWritten(string fileName)
-       {
-               EnsureInitialized();
-           if (!ArchipelagoClient.Connected) return;
-          if (TWMFileToLocation.TryGetValue(fileName, out long locId))
-                SendCheck(locId);
-        }
+        public static void OnTWMFileWritten(string fileName)
+        {
+                EnsureInitialized();
+            if (!ArchipelagoClient.Connected) return;
+           if (TWMFileToLocation != null && TWMFileToLocation.TryGetValue(fileName, out long locId))
+                 SendCheck(locId);
+         }
         public static long GetItemLocationId(int itemId)
 {
     if (ItemPickupToLocation.TryGetValue(itemId, out var id))
@@ -234,10 +235,10 @@ private static void EnsureInitialized()
             { 55, LOC_ID_BASE + 51 }, // Dirt
 
             // Tower, Solstice
-            { 75, LOC_ID_BASE + 80 }, // Memory Disk
-            { 76, LOC_ID_BASE + 81 }, // Memory Disk (Backup)
-            { 78, LOC_ID_BASE + 82 }, // Music Box
-            { 77, LOC_ID_BASE + 83 }, // Charged Battery (Green)
+//            { 75, LOC_ID_BASE + 80 }, // Memory Disk
+//            { 76, LOC_ID_BASE + 81 }, // Memory Disk (Backup)
+//            { 78, LOC_ID_BASE + 82 }, // Music Box
+//            { 77, LOC_ID_BASE + 83 }, // Charged Battery (Green)
         };
     }
     catch (System.Exception ex)

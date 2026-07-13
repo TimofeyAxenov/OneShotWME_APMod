@@ -25,10 +25,15 @@ namespace OneShot.Archipelago
 
         private static readonly HashSet<long> CheckedLocations = new();
 
+        public static HashSet<int> PendingAPItems = new HashSet<int>();
+
+        public static bool ReceivingAPItem = false;
+
         public static bool IsLocationChecked(long locationId)
 {
     return CheckedLocations.Contains(locationId);
 }
+
 
 public static void MarkLocationChecked(long locationId)
 {
