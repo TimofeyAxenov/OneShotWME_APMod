@@ -50,6 +50,7 @@ namespace OneShot.Archipelago
             if (!ArchipelagoClient.Connected) return;
             if (ArchipelagoClient.ReceivingAPItem) return;
 
+            if (FlagToLocation == null) return;
             if (FlagToLocation.TryGetValue(flagIndex, out long locId))
             {
                 SendCheck(locId);
@@ -117,6 +118,7 @@ namespace OneShot.Archipelago
                 EnsureInitialized();
             if (!ArchipelagoClient.Connected) return;
             // Custom script handling for region selection and teleportation
+            if (ScriptToLocation == null) return;
             if (ScriptToLocation.TryGetValue(script, out long locId))
                 SendCheck(locId);
         }
@@ -125,6 +127,7 @@ namespace OneShot.Archipelago
         {
                 EnsureInitialized();
             if (!ArchipelagoClient.Connected) return;
+            if (AchievementToLocation == null) return;
             if (AchievementToLocation.TryGetValue(achievementId, out long locId))
                 SendCheck(locId);
         }
@@ -224,7 +227,7 @@ namespace OneShot.Archipelago
 
         public static long GetItemLocationId(int itemId)
 {
-    if (ItemPickupToLocation.TryGetValue(itemId, out var id))
+    if (ItemPickupToLocation != null && ItemPickupToLocation.TryGetValue(itemId, out var id))
         return id;
 
     return -1;
@@ -249,7 +252,8 @@ private static void EnsureInitialized()
             { 429, LOC_ID_BASE + 410 }, { 430, LOC_ID_BASE + 403 }, { 431, LOC_ID_BASE + 405 },
             { 432, LOC_ID_BASE + 404 }, { 433, LOC_ID_BASE + 406 }, { 435, LOC_ID_BASE + 408 },
             { 436, LOC_ID_BASE + 407 }, { 438, LOC_ID_BASE + 409 }, { 439, LOC_ID_BASE + 411 },
-            { 440, LOC_ID_BASE + 412 },
+            { 440, LOC_ID_BASE + 412 }, { 441, LOC_ID_BASE + 412 }, { 442, LOC_ID_BASE + 412 },
+            { 443, LOC_ID_BASE + 412 }, { 444, LOC_ID_BASE + 412 }, { 445, LOC_ID_BASE + 412 },
             // Themes (read-only proxies)
             { 461, LOC_ID_BASE + 500 }, { 462, LOC_ID_BASE + 501 }, { 463, LOC_ID_BASE + 502 },
             { 464, LOC_ID_BASE + 503 }, { 465, LOC_ID_BASE + 504 }, { 466, LOC_ID_BASE + 505 },
@@ -349,14 +353,14 @@ private static void EnsureInitialized()
             { 24, LOC_ID_BASE + 14 },  // Journal
             { 47, LOC_ID_BASE + 15 },  // Gas Mask
             { 48, LOC_ID_BASE + 16 },  // Rubber Gloves
-            { 13, LOC_ID_BASE + 109 }, // Empty Battery
-            { 14, LOC_ID_BASE + 110 }, // Charged Battery
-            { 15, LOC_ID_BASE + 104 }, // Bottle of Smoke
-            { 16, LOC_ID_BASE + 106 }, // Bottle of Acid
-            { 17, LOC_ID_BASE + 107 }, // Wet sponge
+            { 13, LOC_ID_BASE + 110 }, // Empty Battery
+            { 14, LOC_ID_BASE + 111 }, // Charged Battery
+            { 15, LOC_ID_BASE + 106 }, // Bottle of Smoke
+            { 16, LOC_ID_BASE + 107 }, // Bottle of Acid
+            { 17, LOC_ID_BASE + 108 }, // Wet sponge
             { 18, LOC_ID_BASE + 103 }, // Crowbar
             { 22, LOC_ID_BASE + 105 }, // Filled Syringe
-            { 10, LOC_ID_BASE + 108 }, // Lens
+            { 10, LOC_ID_BASE + 109 }, // Lens
 
             // Glen
             { 25, LOC_ID_BASE + 35 },  // Feather
@@ -365,7 +369,7 @@ private static void EnsureInitialized()
             { 28, LOC_ID_BASE + 30 },  // Seed
             { 50, LOC_ID_BASE + 33 },  // Novelty T-Shirt
             { 29, LOC_ID_BASE + 31 },  // Wool
-            { 30, LOC_ID_BASE + 111 }, // Feather Pen
+            { 30, LOC_ID_BASE + 112 }, // Feather Pen
 
             // Refuge
             { 31, LOC_ID_BASE + 74 }, // Die

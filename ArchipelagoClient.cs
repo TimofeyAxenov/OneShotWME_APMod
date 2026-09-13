@@ -69,7 +69,7 @@ public static bool IsLocationInSeed(long locationId)
                         && optionsObj is JObject optionsJson)
                     {
                         foreach (var kvp in optionsJson)
-                            SlotData[kvp.Key] = kvp.Value;
+                            SlotData[kvp.Key] = kvp.Value!;
                     }
                     object goalVal;
                     string goalStr = SlotData != null && SlotData.TryGetValue("Goal", out goalVal)
@@ -112,13 +112,13 @@ public static bool IsLocationInSeed(long locationId)
                 $"Archipelago: Received '{item.ItemName}' AP={item.ItemId} gameId={gameItemId}");
 
             // Traps
-            if (item.ItemName == "Spooky Popup Trap" || item.ItemName == "Crash Trap")
-            {
-                GameStateManager.PendingTraps.Enqueue(item.ItemName);
-                GameStateManager.PendingChat.Enqueue($"[Trap] {item.ItemName}!");
-                _appliedItemCount++;
-                return;
-            }
+//            if (item.ItemName == "Spooky Popup Trap" || item.ItemName == "Crash Trap")
+//            {
+//                GameStateManager.PendingTraps.Enqueue(item.ItemName);
+//                GameStateManager.PendingChat.Enqueue($"[Trap] {item.ItemName}!");
+//                _appliedItemCount++;
+//                return;
+//            }
 
             // Logical keys (700-704) — no game action, just notify and track ownership
             if (gameItemId >= 700 && gameItemId <= 704)

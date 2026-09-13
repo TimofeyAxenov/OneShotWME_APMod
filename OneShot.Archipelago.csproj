@@ -29,7 +29,4 @@
     <PackageReference Include="Archipelago.MultiClient.Net" Version="6.*" />
   </ItemGroup>
 
-  <ItemGroup>
-          <PackageReference Include="Newtonsoft.Json" Version="13.*" />
-  </ItemGroup>
 </Project>

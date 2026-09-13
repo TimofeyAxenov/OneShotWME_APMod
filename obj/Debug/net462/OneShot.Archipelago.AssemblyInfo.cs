@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("oneshot.archipelago")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5a694a9aa562e04f6614df0c0d917b13c8791a77")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+db5a8fa73f18e4292ad493acd811ceaa93d1fd6f")]
 [assembly: System.Reflection.AssemblyProductAttribute("oneshot.archipelago")]
 [assembly: System.Reflection.AssemblyTitleAttribute("oneshot.archipelago")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

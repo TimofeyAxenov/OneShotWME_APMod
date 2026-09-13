@@ -44,7 +44,7 @@ namespace OneShot.Archipelago
             // Give items
             while (PendingItems.TryDequeue(out int itemId))
             {
-                var ItemInterceptedBefore = LocationTracker.InterceptedItems.Contains(itemId);
+                var ItemInterceptedBefore = LocationTracker.InterceptedItems?.Contains(itemId) ?? false;
                 if (!ItemInterceptedBefore) {
                 Mod.Context.Logger.Log($"Archipelago: Applying item ID {itemId}");
                 ArchipelagoClient.ReceivingAPItem = true;

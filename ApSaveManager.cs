@@ -127,7 +127,7 @@ namespace OneShot.Archipelago
                 if (!osWindow.titleScreenMan!.IsOpen())
                     Mod.Context.Logger.Log("Archipelago: Closing in-game OneShot for save switch.");
 
-                Game1.windowMan.RemoveWindow(osWindow);
+                Game1.windowMan!.RemoveWindow(osWindow);
             }
 
             Patches.WindowManagerHelper.ReloadDesktop();

@@ -1,4 +1,7 @@
-﻿using OneShotMG;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using OneShotMG;
 using OneShotMG.src.TWM;
 using OneShot.Archipelago.UI;
 using WorldMachineLoader.API.Core;
@@ -22,6 +25,7 @@ namespace OneShot.Archipelago
         public void OnLoad(ModContext modContext)
         {
             Context = modContext;
+            AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
             Context.Logger.Log("OneShot Archipelago: Loaded!");
 
             // Register all windows for persistent desktop shortcuts
@@ -91,6 +95,19 @@ namespace OneShot.Archipelago
         {
             if (e.AchievementID != null)
                 LocationTracker.OnAchievementUnlocked(e.AchievementID);
+        }
+
+        private static Assembly? OnAssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            var name = new AssemblyName(args.Name);
+            if (name.Name != "Newtonsoft.Json")
+                return null;
+
+            string? dir = Path.GetDirectoryName(typeof(Mod).Assembly.Location);
+            if (dir == null) return null;
+
+            string path = Path.Combine(dir, $"{name.Name}.dll");
+            return File.Exists(path) ? Assembly.LoadFrom(path) : null;
         }
 
         public void OnShutdown()

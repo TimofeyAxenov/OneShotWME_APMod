@@ -18,6 +18,24 @@ namespace OneShot.Archipelago.Patches
             var osWindow = GameStateManager.GetWindow();
             if (osWindow != null && osWindow.menuMan.ItemMan.HasItem(itemId))
                 return true;
+            if (osWindow == null)
+                return true;
+
+            var mapIdField = osWindow.tileMapMan.GetType().GetField("currentMapId",
+                        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+
+            if (mapIdField != null)
+            {
+                int mapId = (int)mapIdField.GetValue(osWindow.tileMapMan);
+                if (mapId == 39)
+                {
+                    return true;
+                }
+                if (mapId == 156)
+                {
+                    return true;
+                }
+            }
 
             if (LocationTracker.ItemPickupToLocation != null &&
                 LocationTracker.ItemPickupToLocation.ContainsKey(itemId))
