@@ -194,7 +194,7 @@ private static void HandleWallpaperItem(int itemId, OneshotWindow osWindow)
 
     long locId = LocationTracker.WallpaperToLocation[gameId];
 
-    if SentButUnreceived.Any(o => o.ID == locId) {
+    if (SentButUnreceived.Contains(locId)) {
         Game1.windowMan.UnlockMan.UnlockWallpaper(gameId);
 
         Game1.windowMan.FileSystem.CreateWallpaperFile(gameId);
@@ -203,10 +203,7 @@ private static void HandleWallpaperItem(int itemId, OneshotWindow osWindow)
 
         APClientWindow.AddMessage($"[Wallpaper] Unlocked wallpaper '{gameId}'");
 
-        var itemToRemove = SentButUnreceived.SingleOrDefault(r => r.Id == locId);
-        if (itemToRemove != null) {
-            SentButUnreceived.Remove(itemToRemove);
-        }
+        SentButUnreceived.Remove(locId);
     } else {
         ReceivedButUnsent.Add(locId);
     }
@@ -220,7 +217,7 @@ private static void HandleThemeItem(int itemId, OneshotWindow osWindow)
 
     long locId = LocationTracker.ThemeToLocation[gameId];
 
-    if SentButUnreceived.Any(o => o.ID == locId) {
+    if (SentButUnreceived.Contains(locId)) {
         Game1.windowMan.UnlockMan.UnlockTheme(gameId);
 
         Game1.windowMan.FileSystem.CreateThemeFile(gameId);
@@ -229,10 +226,7 @@ private static void HandleThemeItem(int itemId, OneshotWindow osWindow)
 
         APClientWindow.AddMessage($"[Theme] Unlocked theme '{gameId}'");
 
-        var itemToRemove = SentButUnreceived.SingleOrDefault(r => r.Id == locId);
-        if (itemToRemove != null) {
-            SentButUnreceived.Remove(itemToRemove);
-        }
+        SentButUnreceived.Remove(locId);
     } else {
         ReceivedButUnsent.Add(locId);
     }
@@ -246,7 +240,7 @@ private static void HandleFriendItem(int itemId, OneshotWindow osWindow)
 
     long locId = LocationTracker.ProfileToLocation[gameId];
 
-    if SentButUnreceived.Any(o => o.ID == locId) {
+    if (SentButUnreceived.Contains(locId)) {
 
         Game1.windowMan.UnlockMan.UnlockProfile(gameId);
 
@@ -254,10 +248,7 @@ private static void HandleFriendItem(int itemId, OneshotWindow osWindow)
 
         APClientWindow.AddMessage($"[Profile] Unlocked profile '{gameId}'");
         
-        var itemToRemove = SentButUnreceived.SingleOrDefault(r => r.Id == locId);
-        if (itemToRemove != null) {
-            SentButUnreceived.Remove(itemToRemove);
-        }
+        SentButUnreceived.Remove(locId);
     } else {
         ReceivedButUnsent.Add(locId);
     }
@@ -285,17 +276,14 @@ private static void HandleBadgeItem(int itemId, OneshotWindow osWindow)
 
     long locId = LocationTracker.BadgeToLocation[badgeId];
 
-    if SentButUnreceived.Any(o => o.ID == locId) {
+    if (SentButUnreceived.Contains(locId)) {
         Game1.windowMan.UnlockMan.UnlockAchievement(badgeId);
 
         Game1.windowMan.SaveDesktopAndFileSystem();
 
         APClientWindow.AddMessage($"[Badge] Unlocked badge '{badgeId}'");
 
-        var itemToRemove = SentButUnreceived.SingleOrDefault(r => r.Id == locId);
-        if (itemToRemove != null) {
-            SentButUnreceived.Remove(itemToRemove);
-        }
+        SentButUnreceived.Remove(locId);
     } else {
         ReceivedButUnsent.Add(locId);
     }

@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using OneShot.Archipelago.UI;
+using OneShotMG;
+using OneShotMG.src.TWM;
+using OneShotMG.src.TWM.Filesystem;
 
 namespace OneShot.Archipelago
 {
@@ -136,7 +139,7 @@ namespace OneShot.Archipelago
             {
                 if (ArchipelagoClient.IsLocationInSeed(locId)) {
                     SendCheck(locId);
-                    if GameStateManager.ReceivedButUnsent.Any(o => o.ID == locId) {
+                    if (GameStateManager.ReceivedButUnsent.Contains(locId)) {
                         Game1.windowMan.UnlockMan.UnlockAchievement(achievementId);
 
                     Game1.windowMan.SaveDesktopAndFileSystem();
@@ -168,7 +171,7 @@ namespace OneShot.Archipelago
                 if (ArchipelagoClient.IsLocationInSeed(locId))
                 {
                     SendCheck(locId);
-                    if GameStateManager.ReceivedButUnsent.Any(o => o.ID == locId) {
+                    if (GameStateManager.ReceivedButUnsent.Contains(locId)) {
                         Game1.windowMan.UnlockMan.UnlockWallpaper(id);
 
                     Game1.windowMan.FileSystem.CreateWallpaperFile(id);
@@ -193,10 +196,9 @@ namespace OneShot.Archipelago
             if (ThemeToLocation == null) return false;
             if (ThemeToLocation.TryGetValue(id, out long locId))
             {
-                if (ArchipelagoClient.IsLocationInSeed(locId))
-                {
+                if (ArchipelagoClient.IsLocationInSeed(locId)) {
                     SendCheck(locId);
-                    if GameStateManager.ReceivedButUnsent.Any(o => o.ID == locId) {
+                    if (GameStateManager.ReceivedButUnsent.Contains(locId)) {
                         Game1.windowMan.UnlockMan.UnlockTheme(id);
 
                         Game1.windowMan.FileSystem.CreateThemeFile(id);
@@ -224,7 +226,7 @@ namespace OneShot.Archipelago
                 if (ArchipelagoClient.IsLocationInSeed(locId))
                 {
                     SendCheck(locId);
-                    if GameStateManager.ReceivedButUnsent.Any(o => o.ID == locId) {
+                    if (GameStateManager.ReceivedButUnsent.Contains(locId)) {
                         Game1.windowMan.UnlockMan.UnlockProfile(id);
 
                         Game1.windowMan.SaveDesktopAndFileSystem();
@@ -239,22 +241,31 @@ namespace OneShot.Archipelago
             return false;
         }
 
-//        public static bool OnBadgeUnlocked(string id)
-//        {
-//            EnsureInitialized();
-//            if (!APSaveManager.IsAPModeActive) return false;
-//            if (ArchipelagoClient.ReceivingAPItem) return false;
-//            if (BadgeToLocation == null) return false;
-//            if (BadgeToLocation.TryGetValue(id, out long locId))
-//            {
-//                if (ArchipelagoClient.IsLocationInSeed(locId))
-//                {
-//                    SendCheck(locId);
-//                    return true;
-//                }
-//            }
-//            return false;
-//        }
+        public static bool OnBadgeUnlocked(string id)
+        {
+            EnsureInitialized();
+            if (!APSaveManager.IsAPModeActive) return false;
+            if (ArchipelagoClient.ReceivingAPItem) return false;
+            if (BadgeToLocation == null) return false;
+            if (BadgeToLocation.TryGetValue(id, out long locId))
+            {
+                if (ArchipelagoClient.IsLocationInSeed(locId))
+                {
+                    SendCheck(locId);
+                    if (GameStateManager.ReceivedButUnsent.Contains(locId)) {
+                        Game1.windowMan.UnlockMan.UnlockAchievement(id);
+
+                    Game1.windowMan.SaveDesktopAndFileSystem();
+
+                    APClientWindow.AddMessage($"[Badge] Unlocked badge '{id}'");
+                    } else {
+                        GameStateManager.SentButUnreceived.Add(locId);    
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
 
         public static bool OnFileWritten(string fileName)
         {
@@ -424,8 +435,6 @@ private static void EnsureInitialized()
             { 50, LOC_ID_BASE + 33 },  // Novelty T-Shirt
             { 29, LOC_ID_BASE + 31 },  // Wool
             { 30, LOC_ID_BASE + 112 }, // Feather Pen
-            if (ProfileToLocation.TryGetValue(id, out long locId))
-            {
 
             // Refuge
             { 31, LOC_ID_BASE + 74 }, // Die
@@ -465,5 +474,4 @@ private static void EnsureInitialized()
     }
 }
     }
-}
 }
