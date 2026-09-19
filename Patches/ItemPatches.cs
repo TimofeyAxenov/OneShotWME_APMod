@@ -27,7 +27,7 @@ namespace OneShot.Archipelago.Patches
             if (mapIdField != null)
             {
                 int mapId = (int)mapIdField.GetValue(osWindow.tileMapMan);
-                if (mapId == 39)
+                if (mapId == 39 & itemId == 1)
                 {
                     return true;
                 }

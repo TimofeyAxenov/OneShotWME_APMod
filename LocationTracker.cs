@@ -26,6 +26,7 @@ namespace OneShot.Archipelago
 
         public static Dictionary<string, long>? BadgeToLocation = null;
 
+
         public const int FLAG_NORMAL_ENDING   = 147;
         public const int FLAG_LEAVE_ENDING    = 153;
         public const int FLAG_SOLSTICE_ENDING = 160;
@@ -43,6 +44,7 @@ namespace OneShot.Archipelago
             Mod.Context.Logger.Log($"Archipelago: Sending location check {locationId}");
             ArchipelagoClient.SendLocationCheck(locationId);
             APClientWindow.AddMessage($"[Check] Sent location {locationId}");
+            
         }
 
         public static void OnFlagSet(int flagIndex)
@@ -127,9 +129,24 @@ namespace OneShot.Archipelago
         {
                 EnsureInitialized();
             if (!ArchipelagoClient.Connected) return;
+            if (!APSaveManager.IsAPModeActive) return;
+            if (ArchipelagoClient.ReceivingAPItem) return;
             if (AchievementToLocation == null) return;
             if (AchievementToLocation.TryGetValue(achievementId, out long locId))
-                SendCheck(locId);
+            {
+                if (ArchipelagoClient.IsLocationInSeed(locId)) {
+                    SendCheck(locId);
+                    if GameStateManager.ReceivedButUnsent.Any(o => o.ID == locId) {
+                        Game1.windowMan.UnlockMan.UnlockAchievement(achievementId);
+
+                    Game1.windowMan.SaveDesktopAndFileSystem();
+
+                    APClientWindow.AddMessage($"[Badge] Unlocked badge '{achievementId}'");
+                    } else {
+                        GameStateManager.SentButUnreceived.Add(locId);    
+                    }
+                }
+            }
         }
 
         public static void OnTWMFileWritten(string fileName)
@@ -151,6 +168,17 @@ namespace OneShot.Archipelago
                 if (ArchipelagoClient.IsLocationInSeed(locId))
                 {
                     SendCheck(locId);
+                    if GameStateManager.ReceivedButUnsent.Any(o => o.ID == locId) {
+                        Game1.windowMan.UnlockMan.UnlockWallpaper(id);
+
+                    Game1.windowMan.FileSystem.CreateWallpaperFile(id);
+
+                    Game1.windowMan.SaveDesktopAndFileSystem();
+
+                    APClientWindow.AddMessage($"[Wallpaper] Unlocked wallpaper '{id}'");
+                    } else {
+                        GameStateManager.SentButUnreceived.Add(locId);
+                    }
                     return true;
                 }
             }
@@ -168,6 +196,17 @@ namespace OneShot.Archipelago
                 if (ArchipelagoClient.IsLocationInSeed(locId))
                 {
                     SendCheck(locId);
+                    if GameStateManager.ReceivedButUnsent.Any(o => o.ID == locId) {
+                        Game1.windowMan.UnlockMan.UnlockTheme(id);
+
+                        Game1.windowMan.FileSystem.CreateThemeFile(id);
+
+                        Game1.windowMan.SaveDesktopAndFileSystem();
+
+                        APClientWindow.AddMessage($"[Theme] Unlocked theme '{id}'");
+                    } else {
+                        GameStateManager.SentButUnreceived.Add(locId);
+                    }
                     return true;
                 }
             }
@@ -185,28 +224,37 @@ namespace OneShot.Archipelago
                 if (ArchipelagoClient.IsLocationInSeed(locId))
                 {
                     SendCheck(locId);
+                    if GameStateManager.ReceivedButUnsent.Any(o => o.ID == locId) {
+                        Game1.windowMan.UnlockMan.UnlockProfile(id);
+
+                        Game1.windowMan.SaveDesktopAndFileSystem();
+
+                        APClientWindow.AddMessage($"[Profile] Unlocked profile '{id}'");
+                    } else {
+                        GameStateManager.SentButUnreceived.Add(locId);
+                    }
                     return true;
                 }
             }
             return false;
         }
 
-        public static bool OnBadgeUnlocked(string id)
-        {
-            EnsureInitialized();
-            if (!APSaveManager.IsAPModeActive) return false;
-            if (ArchipelagoClient.ReceivingAPItem) return false;
-            if (BadgeToLocation == null) return false;
-            if (BadgeToLocation.TryGetValue(id, out long locId))
-            {
-                if (ArchipelagoClient.IsLocationInSeed(locId))
-                {
-                    SendCheck(locId);
-                    return true;
-                }
-            }
-            return false;
-        }
+//        public static bool OnBadgeUnlocked(string id)
+//        {
+//            EnsureInitialized();
+//            if (!APSaveManager.IsAPModeActive) return false;
+//            if (ArchipelagoClient.ReceivingAPItem) return false;
+//            if (BadgeToLocation == null) return false;
+//            if (BadgeToLocation.TryGetValue(id, out long locId))
+//            {
+//                if (ArchipelagoClient.IsLocationInSeed(locId))
+//                {
+//                    SendCheck(locId);
+//                    return true;
+//                }
+//            }
+//            return false;
+//        }
 
         public static bool OnFileWritten(string fileName)
         {
@@ -254,6 +302,7 @@ private static void EnsureInitialized()
             { 436, LOC_ID_BASE + 407 }, { 438, LOC_ID_BASE + 409 }, { 439, LOC_ID_BASE + 411 },
             { 440, LOC_ID_BASE + 412 }, { 441, LOC_ID_BASE + 412 }, { 442, LOC_ID_BASE + 412 },
             { 443, LOC_ID_BASE + 412 }, { 444, LOC_ID_BASE + 412 }, { 445, LOC_ID_BASE + 412 },
+            { 434, LOC_ID_BASE + 413 },
             // Themes (read-only proxies)
             { 461, LOC_ID_BASE + 500 }, { 462, LOC_ID_BASE + 501 }, { 463, LOC_ID_BASE + 502 },
             { 464, LOC_ID_BASE + 503 }, { 465, LOC_ID_BASE + 504 }, { 466, LOC_ID_BASE + 505 },
@@ -317,6 +366,11 @@ private static void EnsureInitialized()
             { "shepherd",    LOC_ID_BASE + 410 },
             { "kip",         LOC_ID_BASE + 411 },
             { "george1",     LOC_ID_BASE + 412 },
+            { "george2",     LOC_ID_BASE + 412 },
+            { "george3",     LOC_ID_BASE + 412 },
+            { "george4",     LOC_ID_BASE + 412 },
+            { "george5",     LOC_ID_BASE + 412 },
+            { "george6",     LOC_ID_BASE + 412 },
         };
     BadgeToLocation = new Dictionary<string, long> {
             { "CHAOTIC_EVIL",      LOC_ID_BASE + 600 },
@@ -370,6 +424,8 @@ private static void EnsureInitialized()
             { 50, LOC_ID_BASE + 33 },  // Novelty T-Shirt
             { 29, LOC_ID_BASE + 31 },  // Wool
             { 30, LOC_ID_BASE + 112 }, // Feather Pen
+            if (ProfileToLocation.TryGetValue(id, out long locId))
+            {
 
             // Refuge
             { 31, LOC_ID_BASE + 74 }, // Die
@@ -409,4 +465,5 @@ private static void EnsureInitialized()
     }
 }
     }
+}
 }
