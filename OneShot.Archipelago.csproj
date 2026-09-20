@@ -5,28 +5,42 @@
     <RootNamespace>OneShot.Archipelago</RootNamespace>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <OneshotRootPath>C:\Program Files (x86)\Steam\steamapps\common\OneShot World Machine Edition</OneshotRootPath>
   </PropertyGroup>
+  
+  <Import Project="Local.Build.props" Condition="Exists('Local.Build.props')" />
 
   <ItemGroup>
     <!-- WML API -->
-    <Reference Include="WML.API">
-            <HintPath>/home/timofey/.var/app/com.valvesoftware.Steam/data/Steam/steamapps/common/OneShot World Machine Edition/WML.API.dll</HintPath>
+    <Reference Include="WML.API" Private="false">
+        <HintPath>$(OneshotRootPath)/WML.API.dll</HintPath>
     </Reference>
-    <Reference Include="0Harmony">
-        <HintPath>/home/timofey/.var/app/com.valvesoftware.Steam/data/Steam/steamapps/common/OneShot World Machine Edition/0Harmony.dll</HintPath>
+    <Reference Include="0Harmony" Private="false">
+        <HintPath>$(OneshotRootPath)/0Harmony.dll</HintPath>
     </Reference>
     <!-- Game assemblies -->
-    <Reference Include="OneShotMG">
-      <HintPath>/home/timofey/.var/app/com.valvesoftware.Steam/data/Steam/steamapps/common/OneShot World Machine Edition/OneShotMG.exe</HintPath>
+    <Reference Include="OneShotMG" Private="false">
+      <HintPath>$(OneshotRootPath)/OneShotMG.exe</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework">
-      <HintPath>/home/timofey/.var/app/com.valvesoftware.Steam/data/Steam/steamapps/common/OneShot World Machine Edition/MonoGame.Framework.dll</HintPath>
+    <Reference Include="MonoGame.Framework" Private="false">
+      <HintPath>$(OneshotRootPath)/MonoGame.Framework.dll</HintPath>
     </Reference>
   </ItemGroup>
 
   <ItemGroup>
     <!-- Archipelago client library -->
     <PackageReference Include="Archipelago.MultiClient.Net" Version="6.*" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>None</DebugType>
+    <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="mod.json" CopyToPublishDirectory="Always" />
   </ItemGroup>
 
 </Project>
