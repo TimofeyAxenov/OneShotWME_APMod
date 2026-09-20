@@ -1,0 +1,65 @@
+name: build.yml
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache OneShot
+        id: cache_oneshot
+        uses: actions/cache@v6
+        with:
+          path: ~/oneshot
+          key: oneshot
+      
+      - name: Setup steamcmd
+        id: steamcmd_setup
+        if: ${{ !steps.cache_oneshot.outputs.cache-hit }}
+        uses: Lordfirespeed/setup-steamcmd@v2
+        
+      - name: Log in to Steam
+        working-directory: ${{ steps.steamcmd_setup.outputs.directory }}
+        env:
+          STEAM_CONFIG: ${{ secrets.STEAM_CONFIG }}
+        if: ${{ !steps.cache_oneshot.outputs.cache-hit }}
+        run: |
+          mkdir -p $HOME/Steam/config/
+          echo $STEAM_CONFIG > $HOME/Steam/config/config.vdf
+      
+      - name: Install Oneshot
+        env:
+          STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }}
+        working-directory: ${{ steps.steamcmd_setup.outputs.directory }}
+        if: ${{ !steps.cache_oneshot.outputs.cache-hit }}
+        run:
+          steamcmd +@sSteamCmdForcePlatformType windows +force_install_dir $HOME/oneshot +login $STEAM_USERNAME +app_update 2915460 verify +quit
+  
+      - name: Copy WML
+        env:
+          WML_VERSION: 0.3.1-alpha
+        if: ${{ !steps.cache_oneshot.outputs.cache-hit }}
+        run: |
+          curl -L https://github.com/ref-err/WorldMachineLoader/releases/download/v"$WML_VERSION"/WML-"$WML_VERSION".zip -o $HOME/wml.zip
+          unzip $HOME/wml.zip -d $HOME/oneshot
+  
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      
+      - name: Restore OneShot.Archipelago
+        run:
+          dotnet restore --locked-mode
+        
+      - name: Build OneShot.Archipelago
+        run:
+          dotnet build --no-restore -p:OneshotRootPath="$HOME/oneshot" -p:WorldMachineLoaderPath="$HOME/wml/bin/Release" -c Release
+      
+      - name: Publish OneShot.Archipelago
+        run:
+          dotnet publish --no-restore --no-build -c Release -o $HOME/release/Oneshot.Archipelago
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: Oneshot.Archipelago
+          path: ~/release
