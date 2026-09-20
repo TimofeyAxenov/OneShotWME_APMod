@@ -8,6 +8,9 @@ using OneShot.Archipelago.UI;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using OneShotMG;
+using OneShotMG.src.TWM;
 
 namespace OneShot.Archipelago
 {
@@ -61,30 +64,51 @@ public static bool IsLocationInSeed(long locationId)
                     password: password
                 );
 
-                if (result is LoginSuccessful success)
+                switch (result)
                 {
-                    SlotData = success.SlotData;
-                    object optionsObj;
-                    if (SlotData != null && SlotData.TryGetValue("options", out optionsObj)
-                        && optionsObj is JObject optionsJson)
+                    case LoginSuccessful success:
                     {
-                        foreach (var kvp in optionsJson)
-                            SlotData[kvp.Key] = kvp.Value!;
+                        SlotData = success.SlotData;
+                        object optionsObj;
+                        if (SlotData != null && SlotData.TryGetValue("options", out optionsObj)
+                                             && optionsObj is JObject optionsJson)
+                        {
+                            foreach (var kvp in optionsJson)
+                                SlotData[kvp.Key] = kvp.Value!;
+                        }
+                        object goalVal;
+                        string goalStr = SlotData != null && SlotData.TryGetValue("Goal", out goalVal)
+                            ? goalVal.ToString() : "unknown";
+                        Mod.Context.Logger.Log($"Archipelago: Connected as {slotName}! Goal = {goalStr}");
+                        APClientWindow.AddMessage($"Connected as {slotName}!");
+                        return true;
                     }
-                    object goalVal;
-                    string goalStr = SlotData != null && SlotData.TryGetValue("Goal", out goalVal)
-                        ? goalVal.ToString() : "unknown";
-                    Mod.Context.Logger.Log($"Archipelago: Connected as {slotName}! Goal = {goalStr}");
-                    APClientWindow.AddMessage($"Connected as {slotName}!");
-                    return true;
+                    case LoginFailure failure:
+                    {
+                        if (failure.ErrorCodes.Contains(ConnectionRefusedError.InvalidSlot))
+                        {
+                            GameStateManager.GetWindow()?.ShowModalWindow(ModalWindow.ModalType.Error, "Check the slot name and try again.");
+                        }
+                        else if (failure.ErrorCodes.Contains(ConnectionRefusedError.InvalidGame))
+                        {
+                            GameStateManager.GetWindow()?.ShowModalWindow(ModalWindow.ModalType.Error, "This slot is not configured for OneShot: World Machine Edition.");
+                        }
+                        else if (failure.ErrorCodes.Contains(ConnectionRefusedError.InvalidPassword))
+                        {
+                            GameStateManager.GetWindow()?.ShowModalWindow(ModalWindow.ModalType.Error, "Check the password and try again.");
+                        }
+                        else
+                        {
+                            GameStateManager.GetWindow()?.ShowModalWindow(ModalWindow.ModalType.Error, "Unable to connect to Archipelago.");
+                        }
+                        Mod.Context.Logger.Log($"Archipelago: Connection failed — {string.Join(", ", failure.Errors)}");
+                        Session = null;
+                        return false;
+                    }
+                    default:
+                        // Ideally we'd throw UnreachableException but this isn't available in the current version of .NET
+                        throw new InvalidOperationException();
                 }
-                else if (result is LoginFailure failure)
-                {
-                    Mod.Context.Logger.Log($"Archipelago: Connection failed — {string.Join(", ", failure.Errors)}");
-                    return false;
-                }
-
-                return false;
             }
             catch (Exception ex)
             {
