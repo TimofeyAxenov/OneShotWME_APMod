@@ -42,7 +42,7 @@ namespace OneShot.Archipelago.UI
         }
 
         public APHintsWindow()
-            : base("AP Hints", "oneshot", W, H, addCloseButton: true, addMinimizeButton: true)
+            : base("AP Hints", "oneshot", W, H, WindowButtons.Minimize)
         {
             int y = PAD;
 

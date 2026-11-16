@@ -43,7 +43,7 @@ namespace OneShot.Archipelago.UI
         }
 
         public APLocationWindow()
-            : base("AP Locations", "oneshot", W, H, addCloseButton: true, addMinimizeButton: true)
+            : base("AP Locations", "oneshot", W, H, WindowButtons.Minimize)
         {
             int y = PAD;
 

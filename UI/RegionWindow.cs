@@ -29,7 +29,7 @@ namespace OneShot.Archipelago.UI
 
                 public static void Close() { _instance = null; }
 
-                public RegionWindow() : base("Region Selection Window", "", W, H, addCloseButton: true, addMinimizeButton: true)
+                public RegionWindow() : base("Region Selection Window", "", W, H, WindowButtons.Minimize)
                 {
                         int y = PAD;
                         y += 24;

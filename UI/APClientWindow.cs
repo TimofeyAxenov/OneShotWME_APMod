@@ -43,7 +43,7 @@ namespace OneShot.Archipelago.UI
         }
 
         public APClientWindow()
-            : base("AP Chat", "oneshot", W, H, addCloseButton: true, addMinimizeButton: true)
+            : base("AP Chat", "oneshot", W, H, WindowButtons.Minimize)
         {
             int y = PAD;
 

@@ -26,7 +26,7 @@ namespace OneShot.Archipelago.UI
         private List<APSaveManager.APSaveInfo> _saves = new List<APSaveManager.APSaveInfo>();
 
         public APSaveManagerWindow()
-            : base("AP Save Manager", "oneshot", W, H, addCloseButton: true, addMinimizeButton: true)
+            : base("AP Save Manager", "oneshot", W, H, WindowButtons.Minimize)
         {
             int y = PAD;
 
