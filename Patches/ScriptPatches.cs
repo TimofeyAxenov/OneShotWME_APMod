@@ -39,11 +39,11 @@ namespace OneShot.Archipelago.Patches
                     if (mapIdField != null)
                     {
                         int mapId = (int)mapIdField.GetValue(osWindow.tileMapMan);
-                        if (mapId == 63)
-                        {
-                            Mod.Context.Logger.Log("Archipelago: Map 63 quit detected — sending leave ending goal");
-                            LocationTracker.OnLeaveEnding();
-                        }
+                    //    if (mapId == 63)
+                    //    {
+                    //        Mod.Context.Logger.Log("Archipelago: Map 63 quit detected — sending leave ending goal");
+                    //        LocationTracker.OnLeaveEnding();
+                    //   }
                     }
                 }
             }

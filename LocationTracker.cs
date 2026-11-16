@@ -81,28 +81,28 @@ namespace OneShot.Archipelago
                 ArchipelagoClient.SendGoalCompletion();
         }
 
-        public static void OnLeaveEnding()
-        {
-            if (!ArchipelagoClient.Connected) return;
+//        public static void OnLeaveEnding()
+//        {
+//            if (!ArchipelagoClient.Connected) return;
 
-            var slotData = ArchipelagoClient.SlotData;
-            if (slotData == null) return;
+//            var slotData = ArchipelagoClient.SlotData;
+//            if (slotData == null) return;
 
-            object goalVal;
-            int goal = 1;
-            if (slotData.TryGetValue("Goal", out goalVal))
-            {
-                if (goalVal is Newtonsoft.Json.Linq.JValue jv)
-                    goal = jv.ToObject<int>();
-                else if (goalVal is long l)
-                    goal = (int)l;
-                else if (goalVal is int i)
-                    goal = i;
-            }
+//            object goalVal;
+//            int goal = 1;
+//            if (slotData.TryGetValue("Goal", out goalVal))
+//            {
+//                if (goalVal is Newtonsoft.Json.Linq.JValue jv)
+//                    goal = jv.ToObject<int>();
+//                else if (goalVal is long l)
+//                    goal = (int)l;
+//                else if (goalVal is int i)
+//                    goal = i;
+//            }
 
-            if (goal == 0)
-                ArchipelagoClient.SendGoalCompletion();
-        }
+//            if (goal == 0)
+//                ArchipelagoClient.SendGoalCompletion();
+//        }
 
         // Maps game item ID → AP location ID for base item pickup locations
         // These match the location names and IDs in Locations.py

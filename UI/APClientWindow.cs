@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using OneShotMG;
+using OneShotMG.src.TWM;
 using OneShotMG.src.Util;
 using WorldMachineLoader.API.Core;
 using WorldMachineLoader.API.UI;
@@ -11,6 +12,12 @@ namespace OneShot.Archipelago.UI
     {
         private static APClientWindow? _instance;
 
+        // Chat history is shared by all instances: the game/WML recreate mod windows
+        // from scratch when the desktop shortcut is used, so an instance-owned log
+        // would be lost (and messages delivered while the window is closed too).
+        private static readonly List<string> _lines = new List<string>();
+        private static int _historyRevision;
+
         private const int W        = 340;
         private const int H        = 260;
         private const int PAD      = 6;
@@ -19,8 +26,8 @@ namespace OneShot.Archipelago.UI
         private const int MAX_MSGS = 200;
         private const int MAX_LINE = 46;
 
-        private readonly List<string> _lines = new List<string>();
         private int _scroll = 0;
+        private int _shownRevision = -1;
 
         // One Label per visible row — fixed set, text swapped on scroll
         private readonly Label[] _rowLabels = new Label[VISIBLE];
@@ -38,16 +45,17 @@ namespace OneShot.Archipelago.UI
         public static void AddMessage(string message)
         {
             Mod.Context.Logger.Log($"[AP] {message}");
-            if (_instance == null) return;
-            _instance.AppendWrapped(message);
+            AppendWrapped(message);   // keep the line even if no window is open
         }
 
         public APClientWindow()
             : base("AP Chat", "oneshot", W, H, WindowButtons.Minimize)
         {
+            _instance = this;
+            onClose += OnClosed;
+
             int y = PAD;
 
-            // Row labels — one per visible line
             for (int i = 0; i < VISIBLE; i++)
             {
                 _rowLabels[i] = new Label("", new Vec2(PAD, y + i * ROW_H));
@@ -67,12 +75,29 @@ namespace OneShot.Archipelago.UI
 
             y += 22;
             AddControl(new Button("Send", new Vec2(PAD, y), OnSend));
+
+            _scroll = System.Math.Max(0, _lines.Count - VISIBLE);
+            RedrawRows();
+            _shownRevision = _historyRevision;
+        }
+
+        private static void OnClosed(TWMWindow window)
+        {
+            if (window is APClientWindow)
+                _instance = null;
         }
 
         protected override void OnUpdate()
         {
             if (!Game1.windowMan.IsWindowFocused(this))
                 _inputBox.IsFocused = false;
+
+            if (_shownRevision != _historyRevision)
+            {
+                _shownRevision = _historyRevision;
+                _scroll = System.Math.Max(0, _lines.Count - VISIBLE);
+                RedrawRows();
+            }
         }
 
         private void OnScrollUp()
@@ -94,7 +119,7 @@ namespace OneShot.Archipelago.UI
             _inputBox.Text = "";
         }
 
-        private void AppendWrapped(string msg)
+        private static void AppendWrapped(string msg)
         {
             while (msg.Length > MAX_LINE)
             {
@@ -108,9 +133,7 @@ namespace OneShot.Archipelago.UI
             while (_lines.Count > MAX_MSGS)
                 _lines.RemoveAt(0);
 
-            // Auto-scroll to bottom
-            _scroll = System.Math.Max(0, _lines.Count - VISIBLE);
-            RedrawRows();
+            _historyRevision++;
         }
 
         private void RedrawRows()
