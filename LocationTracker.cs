@@ -399,6 +399,7 @@ private static void EnsureInitialized()
         };
     ItemPickupToLocation = new Dictionary<int, long> {
             // Starter House
+            { 2, LOC_ID_BASE + 5 }, // PC Room Floor (remote)
             { 4,  LOC_ID_BASE + 1  },  // Left Room (branch)
             { 7,  LOC_ID_BASE + 3  },  // Floorboards (basement key)
             { 3, LOC_ID_BASE + 2  },  // Fridge (bottle of alcohol)

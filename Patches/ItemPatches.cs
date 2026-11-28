@@ -37,6 +37,12 @@ namespace OneShot.Archipelago.Patches
                 }
             }
 
+            // The TV remote must never be intercepted: it is needed to use the PC,
+            // so let it into the inventory. Its location check is still sent by
+            // ItemAddedEvent when AddItem completes.
+            if (itemId == 2)
+                return true;
+
             if (LocationTracker.ItemPickupToLocation != null &&
                 LocationTracker.ItemPickupToLocation.ContainsKey(itemId))
             {

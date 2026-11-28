@@ -30,9 +30,9 @@ namespace OneShot.Archipelago
 
             // Register all windows for persistent desktop shortcuts
             WindowRegistry.Register<APSaveManagerWindow>(Context, "AP Save Manager");
-            WindowRegistry.Register<APClientWindow>(Context, "AP Chat");
-            WindowRegistry.Register<APLocationWindow>(Context, "AP Locations");
-            WindowRegistry.Register<APHintsWindow>(Context, "AP Hints");
+            // WindowRegistry.Register<APClientWindow>(Context, "AP Chat");
+            // WindowRegistry.Register<APLocationWindow>(Context, "AP Locations");
+            // WindowRegistry.Register<APHintsWindow>(Context, "AP Hints");
 
             // Events
             EventBus.Subscribe<Game1InitializeEvent>(OnGameInitialize);
