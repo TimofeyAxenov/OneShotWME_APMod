@@ -55,7 +55,7 @@ public static bool IsLocationInSeed(long locationId)
                 Session.Locations.CheckedLocationsUpdated += OnCheckedLocationsUpdated;
 
                 var result = Session.TryConnectAndLogin(
-                    game: "OneShot World Machine Edition",
+                    game: "OneShot: World Machine Edition",
                     name: slotName,
                     itemsHandlingFlags: ItemsHandlingFlags.AllItems,
                     password: password
